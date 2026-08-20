@@ -1,3 +1,5 @@
+import SignOutButton from '../../components/SignOutButton.jsx'
+
 export default function ChwApp() {
   return (
     <div className="scaffold-screen">
@@ -9,7 +11,8 @@ export default function ChwApp() {
         interactive in lafiya-mockup.html -- this route is the real
         deploy target they migrate into next, screen by screen.
       </p>
-      <span className="stamp pending">Phase 0</span>
+      <span className="stamp pending">Phase 1: auth live</span>
+      <SignOutButton />
     </div>
   )
 }
