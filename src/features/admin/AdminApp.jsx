@@ -1,3 +1,5 @@
+import SignOutButton from '../../components/SignOutButton.jsx'
+
 export default function AdminApp() {
   return (
     <div className="scaffold-screen">
@@ -9,7 +11,8 @@ export default function AdminApp() {
         GET/PATCH /api/admin/pharmacies and /api/admin/fraud-flags is
         next.
       </p>
-      <span className="stamp pending">Phase 0</span>
+      <span className="stamp pending">Phase 1: auth live</span>
+      <SignOutButton />
     </div>
   )
 }
