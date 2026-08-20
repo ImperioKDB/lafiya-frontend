@@ -82,6 +82,32 @@ a {
 .btn-outline { background: transparent; border-color: var(--border); color: var(--ink); }
 .btn:disabled { opacity: 0.4; cursor: not-allowed; }
 
+.field {
+  margin-bottom: 16px;
+}
+.field label {
+  display: block;
+  font-size: 13px;
+  font-weight: 600;
+  margin-bottom: 6px;
+  color: var(--ink);
+}
+.field input,
+.field textarea {
+  width: 100%;
+  min-height: 44px;
+  border: 1.5px solid var(--border);
+  border-radius: var(--radius-sm);
+  padding: 0 12px;
+  background: #fff;
+  font-size: 15px;
+  color: var(--ink);
+}
+.field input:focus,
+.field textarea:focus {
+  border-color: var(--teal);
+}
+
 .ledger-card {
   background: var(--paper-card);
   border: 1px solid var(--border);
