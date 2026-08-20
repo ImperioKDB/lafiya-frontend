@@ -1,0 +1,103 @@
+* {
+  box-sizing: border-box;
+}
+html, body, #root {
+  height: 100%;
+}
+body {
+  margin: 0;
+  font-family: var(--font-sans);
+  color: var(--ink);
+  background: var(--paper);
+  -webkit-font-smoothing: antialiased;
+}
+button, input, textarea, select {
+  font-family: inherit;
+}
+a {
+  color: inherit;
+}
+:focus-visible {
+  outline: 3px solid var(--indigo);
+  outline-offset: 2px;
+}
+
+.eyebrow {
+  font-family: var(--font-type);
+  font-size: 11px;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--ink-soft);
+  margin: 0 0 6px;
+}
+.muted {
+  color: var(--ink-soft);
+  font-size: 13px;
+}
+.mono {
+  font-family: var(--font-mono);
+}
+
+/* Signature element -- see lafiya-mockup.html for the full state set
+   and the "thunk" entrance animation. Ported here without the
+   animation yet; that arrives with the first screen that actually
+   flips a stamp on a real state change. */
+.stamp {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  font-family: var(--font-type);
+  font-size: 11px;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+  padding: 4px 11px;
+  border: 2px solid currentColor;
+  border-radius: 4px;
+  transform: rotate(-3deg);
+  background: rgba(0, 0, 0, 0.02);
+}
+.stamp.pending { color: var(--brass); }
+.stamp.verified, .stamp.confirmed, .stamp.matched, .stamp.repaid, .stamp.cleared { color: var(--teal); }
+.stamp.flagged, .stamp.declined, .stamp.rejected, .stamp.defaulted, .stamp.confirmed_fraud { color: var(--stamp); }
+.stamp.completed, .stamp.reviewed, .stamp.disbursed { color: var(--indigo); }
+
+.btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  min-height: 44px;
+  padding: 0 18px;
+  border-radius: var(--radius-sm);
+  font-size: 14px;
+  font-weight: 600;
+  border: 1.5px solid transparent;
+  cursor: pointer;
+  transition: filter 0.12s, transform 0.08s;
+}
+.btn:active { transform: scale(0.98); }
+.btn-primary { background: var(--teal); color: #fff; }
+.btn-primary:hover { filter: brightness(1.08); }
+.btn-indigo { background: var(--indigo); color: #fff; }
+.btn-outline { background: transparent; border-color: var(--border); color: var(--ink); }
+.btn:disabled { opacity: 0.4; cursor: not-allowed; }
+
+.ledger-card {
+  background: var(--paper-card);
+  border: 1px solid var(--border);
+  border-left: 4px solid var(--teal);
+  border-radius: var(--radius);
+  padding: 14px 16px;
+  box-shadow: var(--shadow);
+  margin-bottom: 12px;
+}
+.ledger-card.finance { border-left-color: var(--indigo); }
+.ledger-card.alert { border-left-color: var(--stamp); }
+
+/* Phase-0 placeholder screens only -- deleted once real routes exist. */
+.scaffold-screen {
+  max-width: 480px;
+  margin: 80px auto;
+  padding: 0 20px;
+  text-align: center;
+}
