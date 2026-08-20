@@ -1,0 +1,39 @@
+/*
+  Design tokens -- system of record for LAFIYA's visual language.
+  Ported from lafiya-mockup.html after the paper-tone A/B comparison;
+  plain white was the deliberate final call (not the original cream
+  default), so --paper/--paper-card start here as #FFFFFF, not
+  retrofitted later. See the mockup file for the interaction/motion
+  reasoning behind the rest of the system -- this file is the tokens
+  only, components migrate over screen by screen.
+*/
+:root {
+  --paper: #FFFFFF;
+  --paper-card: #FFFFFF;
+  --paper-dim: rgba(255, 255, 255, 0.85);
+
+  --ink: #1B2430;
+  --ink-soft: #5B6472;
+
+  --teal: #1F6F5C;
+  --teal-tint: #E1EBE7;
+
+  --indigo: #3D2C5B;
+  --indigo-tint: #E9E5EF;
+
+  --stamp: #A33B2B;
+  --stamp-tint: #F3E3DF;
+
+  --brass: #B98526;
+  --brass-tint: #F3E9D5;
+
+  --border: #DCD3B8;
+
+  --radius: 10px;
+  --radius-sm: 6px;
+  --shadow: 0 1px 2px rgba(27, 36, 48, 0.07), 0 4px 14px rgba(27, 36, 48, 0.06);
+
+  --font-sans: 'IBM Plex Sans', system-ui, -apple-system, sans-serif;
+  --font-mono: 'IBM Plex Mono', ui-monospace, 'SF Mono', monospace;
+  --font-type: 'Special Elite', monospace;
+}
