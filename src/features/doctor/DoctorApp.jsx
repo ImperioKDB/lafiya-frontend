@@ -1,3 +1,5 @@
+import SignOutButton from '../../components/SignOutButton.jsx'
+
 export default function DoctorApp() {
   return (
     <div className="scaffold-screen">
@@ -8,7 +10,8 @@ export default function DoctorApp() {
         lafiya-mockup.html. Real data wiring against
         GET /api/consultations/queue is next.
       </p>
-      <span className="stamp pending">Phase 0</span>
+      <span className="stamp pending">Phase 1: auth live</span>
+      <SignOutButton />
     </div>
   )
 }
