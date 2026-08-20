@@ -3,7 +3,7 @@ import { useNavigate } from 'react-router-dom'
 import { useAuth } from '../lib/AuthContext.jsx'
 
 export default function Login() {
-  const { signIn, session, profile, loading } = useAuth()
+  const { signIn, session, profile, loading, error } = useAuth()
   const navigate = useNavigate()
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
@@ -15,6 +15,14 @@ export default function Login() {
   if (!loading && session && profile) {
     navigate('/' + profile.role, { replace: true })
   }
+
+  // FIX: previously this state was silent -- sign-in itself can
+  // succeed while the follow-up GET /api/me call fails (backend not
+  // deployed yet, CORS mismatch, account has no chw/doctor/pharmacy
+  // row). That left the button doing nothing visible with no error
+  // shown, which is worse than a clear failure. Signed in + not
+  // loading + no profile + a real error means exactly that case.
+  const showProfileError = !loading && session && !profile && error
 
   async function handleSubmit(e) {
     e.preventDefault()
@@ -36,6 +44,25 @@ export default function Login() {
     <div className="scaffold-screen">
       <p className="eyebrow">LAFIYA</p>
       <h1>Sign in</h1>
+
+      {showProfileError && (
+        <div
+          className="ledger-card alert"
+          style={{ textAlign: 'left', marginTop: 16, marginBottom: 16 }}
+        >
+          <strong style={{ fontSize: 13 }}>Signed in, but couldn't load your account</strong>
+          <p className="muted" style={{ marginTop: 6 }}>{error}</p>
+          <p className="muted" style={{ marginTop: 6 }}>
+            This usually means the backend's /api/me endpoint isn't reachable yet
+            (not deployed, or a CORS mismatch) -- not a wrong password.
+          </p>
+        </div>
+      )}
+
+      {session && loading && !profile && (
+        <p className="muted" style={{ marginTop: 16 }}>Checking your account…</p>
+      )}
+
       <form onSubmit={handleSubmit} style={{ textAlign: 'left', marginTop: 24 }}>
         <div className="field">
           <label htmlFor="email">Email</label>
