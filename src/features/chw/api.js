@@ -115,3 +115,53 @@ export async function submitTextTriage(patientId, transcript, accessToken) {
     body: { patient_id: patientId, transcript },
   })
 }
+
+// ---------------------------------------------------------------------
+// Loans & Guarantors
+// ---------------------------------------------------------------------
+// ASSUMPTION -- same caveat as Triage's audio contract, and this one's
+// the bigger guess of the two. SS12 documents POST /api/loans, GET
+// /api/loans/:id/status, and POST /api/loans/:id/guarantors -- but
+// there's no documented endpoint anywhere in the blueprint for
+// TRIGGERING the Wema/ALAT lookup or the simulated disbursement. It's
+// possible the backend does this automatically once both guarantors
+// confirm (a DB trigger or a background job), in which case
+// disburseLoan() below is simply unnecessary and this screen should
+// just keep polling loan status instead of calling it. Confirm which
+// model the backend actually uses before relying on the disburse
+// button in a demo -- worth checking loans.status transitions in
+// Supabase directly if unsure.
+
+const LOAN_ENDPOINTS = {
+  loans: '/api/loans',
+}
+
+export async function createLoan(patientId, tierAmount, accessToken) {
+  return apiFetch(LOAN_ENDPOINTS.loans, {
+    method: 'POST',
+    accessToken,
+    body: { patient_id: patientId, tier: tierAmount, amount: tierAmount },
+  })
+}
+
+export async function attachGuarantors(loanId, phones, accessToken) {
+  return apiFetch(`${LOAN_ENDPOINTS.loans}/${loanId}/guarantors`, {
+    method: 'POST',
+    accessToken,
+    body: { guarantors: phones.map((phone) => ({ guarantor_phone: phone })) },
+  })
+}
+
+export async function fetchLoanStatus(loanId, accessToken) {
+  return apiFetch(`${LOAN_ENDPOINTS.loans}/${loanId}/status`, { accessToken })
+}
+
+// ASSUMPTION -- no documented endpoint for this trigger anywhere in the
+// blueprint. This is a guess at the path; see the note above this
+// section before wiring a demo around it.
+export async function disburseLoan(loanId, accessToken) {
+  return apiFetch(`${LOAN_ENDPOINTS.loans}/${loanId}/disburse`, {
+    method: 'POST',
+    accessToken,
+  })
+}
