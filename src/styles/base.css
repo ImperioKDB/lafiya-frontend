@@ -107,6 +107,11 @@ a {
 .field textarea:focus {
   border-color: var(--teal);
 }
+.field-error {
+  color: var(--stamp);
+  font-size: 12px;
+  margin: 6px 0 0;
+}
 
 .ledger-card {
   background: var(--paper-card);
