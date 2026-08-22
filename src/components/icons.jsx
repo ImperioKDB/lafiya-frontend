@@ -111,3 +111,39 @@ export function LogoutIcon(props) {
     </svg>
   )
 }
+
+export function MicIcon(props) {
+  return (
+    <svg viewBox="0 0 24 24" {...base} {...props}>
+      <rect x="9" y="3" width="6" height="11" rx="3" />
+      <path d="M5.5 11a6.5 6.5 0 0 0 13 0" />
+      <path d="M12 17.5V21M8.5 21h7" />
+    </svg>
+  )
+}
+
+export function StopIcon(props) {
+  return (
+    <svg viewBox="0 0 24 24" {...base} {...props}>
+      <rect x="6" y="6" width="12" height="12" rx="2" />
+    </svg>
+  )
+}
+
+export function KeyboardIcon(props) {
+  return (
+    <svg viewBox="0 0 24 24" {...base} {...props}>
+      <rect x="2.5" y="6" width="19" height="12" rx="2" />
+      <path d="M6 10h0M9.5 10h0M13 10h0M16.5 10h0M6 14h12" />
+    </svg>
+  )
+}
+
+export function SearchIcon(props) {
+  return (
+    <svg viewBox="0 0 24 24" {...base} {...props}>
+      <circle cx="10.5" cy="10.5" r="6.5" />
+      <path d="m20 20-4.3-4.3" />
+    </svg>
+  )
+}
