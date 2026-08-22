@@ -2,8 +2,9 @@ import { Routes, Route } from 'react-router-dom'
 import ChwShell from './ChwShell.jsx'
 import Dashboard from './Dashboard.jsx'
 import RegisterPatientScreen from './RegisterPatientScreen.jsx'
+import TriageScreen from './TriageScreen.jsx'
 import ComingSoon from './ComingSoon.jsx'
-import { TriageIcon, LoansIcon, EarningsIcon } from '../../components/icons.jsx'
+import { LoansIcon, EarningsIcon } from '../../components/icons.jsx'
 
 // Phase 1 -> Phase 2 migration, screen by screen, per README.md's build
 // order. Dashboard is real; the rest keep the same visual system
@@ -15,17 +16,7 @@ export default function ChwApp() {
       <Route element={<ChwShell />}>
         <Route index element={<Dashboard />} />
         <Route path="register" element={<RegisterPatientScreen />} />
-        <Route
-          path="triage"
-          element={
-            <ComingSoon
-              icon={TriageIcon}
-              title="Symptom Triage"
-              description="Voice capture via Whisper, feeding the same rule-based urgency scorer as the USSD path."
-              endpoint="POST /api/consultations"
-            />
-          }
-        />
+        <Route path="triage" element={<TriageScreen />} />
         <Route
           path="loans"
           element={
