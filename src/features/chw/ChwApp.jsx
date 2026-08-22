@@ -1,8 +1,9 @@
 import { Routes, Route } from 'react-router-dom'
 import ChwShell from './ChwShell.jsx'
 import Dashboard from './Dashboard.jsx'
+import RegisterPatientScreen from './RegisterPatientScreen.jsx'
 import ComingSoon from './ComingSoon.jsx'
-import { RegisterIcon, TriageIcon, LoansIcon, EarningsIcon } from '../../components/icons.jsx'
+import { TriageIcon, LoansIcon, EarningsIcon } from '../../components/icons.jsx'
 
 // Phase 1 -> Phase 2 migration, screen by screen, per README.md's build
 // order. Dashboard is real; the rest keep the same visual system
@@ -13,17 +14,7 @@ export default function ChwApp() {
     <Routes>
       <Route element={<ChwShell />}>
         <Route index element={<Dashboard />} />
-        <Route
-          path="register"
-          element={
-            <ComingSoon
-              icon={RegisterIcon}
-              title="Register Patient"
-              description="Patient registration -- offline-capable, accrues the ₦150 registration fee -- migrates next from lafiya-mockup.html."
-              endpoint="POST /api/patients"
-            />
-          }
-        />
+        <Route path="register" element={<RegisterPatientScreen />} />
         <Route
           path="triage"
           element={
