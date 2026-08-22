@@ -15,6 +15,7 @@ import { apiFetch } from '../../lib/apiClient.js'
 const ENDPOINTS = {
   patients: '/api/patients',
   earnings: '/api/chw/earnings',
+  consultations: '/api/consultations',
 }
 
 // A 404 here means "this endpoint doesn't exist yet on the backend,"
@@ -56,5 +57,61 @@ export async function registerPatient(payload, accessToken) {
       age: payload.age ? Number(payload.age) : null,
       nin: payload.nin || null,
     },
+  })
+}
+
+// ---------------------------------------------------------------------
+// Triage
+// ---------------------------------------------------------------------
+// ASSUMPTION -- the biggest unconfirmed guess in this codebase so far.
+// The blueprint's API design (SS12) documents POST /api/consultations
+// but never specifies an audio-upload contract -- no separate
+// transcribe endpoint, no documented multipart shape. Two real
+// possibilities exist server-side and I can't tell which from the docs
+// alone: (a) this one endpoint accepts an audio file, runs Whisper +
+// the rule-based scorer, and returns the transcript/urgency_score, or
+// (b) transcription happens elsewhere and this endpoint only wants
+// pre-scored text. Both submission paths below hit the SAME endpoint
+// with different content types so whichever shape is right, only one
+// function needs editing once you've checked the live router --
+// nothing in the component needs to change.
+
+export async function fetchPatients(accessToken) {
+  const { data, notBuilt } = await safeFetch(ENDPOINTS.patients, accessToken)
+  return { patients: Array.isArray(data) ? data : [], notBuilt }
+}
+
+// Voice path: raw fetch, not apiFetch, since apiFetch always
+// JSON.stringifies the body -- multipart/form-data needs the browser to
+// set its own boundary'd Content-Type, which only happens if we don't
+// set one manually.
+const API_BASE_URL = import.meta.env.VITE_API_BASE_URL
+
+export async function submitVoiceTriage(patientId, audioBlob, accessToken) {
+  const form = new FormData()
+  form.append('patient_id', patientId)
+  form.append('audio', audioBlob, 'triage-audio.webm')
+
+  const response = await fetch(`${API_BASE_URL}${ENDPOINTS.consultations}`, {
+    method: 'POST',
+    headers: accessToken ? { Authorization: `Bearer ${accessToken}` } : {},
+    body: form,
+  })
+  if (!response.ok) {
+    const errorBody = await response.json().catch(() => ({}))
+    throw new Error(errorBody.detail || `Request failed: ${response.status}`)
+  }
+  return response.json()
+}
+
+// Text fallback path: plain JSON, used when mic access is unavailable
+// or denied, or the CHW simply prefers typing. Keeps the same urgency
+// scorer in play per the blueprint's "single source of truth" note --
+// the scorer just runs against typed text instead of a transcript.
+export async function submitTextTriage(patientId, transcript, accessToken) {
+  return apiFetch(ENDPOINTS.consultations, {
+    method: 'POST',
+    accessToken,
+    body: { patient_id: patientId, transcript },
   })
 }
