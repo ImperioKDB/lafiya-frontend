@@ -3,8 +3,9 @@ import ChwShell from './ChwShell.jsx'
 import Dashboard from './Dashboard.jsx'
 import RegisterPatientScreen from './RegisterPatientScreen.jsx'
 import TriageScreen from './TriageScreen.jsx'
+import LoansScreen from './LoansScreen.jsx'
 import ComingSoon from './ComingSoon.jsx'
-import { LoansIcon, EarningsIcon } from '../../components/icons.jsx'
+import { EarningsIcon } from '../../components/icons.jsx'
 
 // Phase 1 -> Phase 2 migration, screen by screen, per README.md's build
 // order. Dashboard is real; the rest keep the same visual system
@@ -17,17 +18,7 @@ export default function ChwApp() {
         <Route index element={<Dashboard />} />
         <Route path="register" element={<RegisterPatientScreen />} />
         <Route path="triage" element={<TriageScreen />} />
-        <Route
-          path="loans"
-          element={
-            <ComingSoon
-              icon={LoansIcon}
-              title="Loan & Guarantors"
-              description="Tier selection, live fee math, two-guarantor SMS confirmation, and the live Wema/ALAT lookup."
-              endpoint="POST /api/loans"
-            />
-          }
-        />
+        <Route path="loans" element={<LoansScreen />} />
         <Route
           path="earnings"
           element={
