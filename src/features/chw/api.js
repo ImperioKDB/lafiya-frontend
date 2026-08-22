@@ -40,3 +40,21 @@ export async function fetchChwDashboard(accessToken) {
   ])
   return { patients, earnings }
 }
+
+// ASSUMPTION -- confirm against the live router. Body shape assumed
+// from patients' columns (blueprint SS11) minus server-set fields
+// (id, registered_by_chw_id, created_at). `nin` stays optional --
+// simulated per the locked decision in 00_START_HERE.md, never
+// blocking submission.
+export async function registerPatient(payload, accessToken) {
+  return apiFetch(ENDPOINTS.patients, {
+    method: 'POST',
+    accessToken,
+    body: {
+      full_name: payload.fullName,
+      phone: payload.phone,
+      age: payload.age ? Number(payload.age) : null,
+      nin: payload.nin || null,
+    },
+  })
+}
