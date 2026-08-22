@@ -113,6 +113,94 @@ a {
   margin: 6px 0 0;
 }
 
+/* ---- Triage: mic capture, urgency badge, patient picker ------------ */
+.mic-button {
+  width: 88px;
+  height: 88px;
+  border-radius: 50%;
+  border: none;
+  background: var(--teal);
+  color: #fff;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  margin: 0 auto;
+  box-shadow: 0 8px 24px rgba(31, 111, 92, 0.3);
+  transition: transform 0.15s ease, background 0.15s ease;
+}
+.mic-button:active { transform: scale(0.95); }
+.mic-button:disabled { opacity: 0.5; cursor: not-allowed; }
+.mic-button svg { width: 32px; height: 32px; }
+.mic-button.recording {
+  background: var(--stamp);
+  animation: micPulse 1.4s ease-in-out infinite;
+}
+@keyframes micPulse {
+  0%, 100% { box-shadow: 0 0 0 0 rgba(163, 59, 43, 0.35); }
+  50% { box-shadow: 0 0 0 16px rgba(163, 59, 43, 0); }
+}
+@media (prefers-reduced-motion: reduce) {
+  .mic-button.recording { animation: none; }
+}
+.mic-timer {
+  font-family: var(--font-mono);
+  font-variant-numeric: tabular-nums;
+  font-size: 22px;
+  margin-top: 16px;
+  text-align: center;
+}
+.mic-hint {
+  text-align: center;
+  color: var(--ink-soft);
+  font-size: 13px;
+  margin-top: 8px;
+}
+
+.urgency-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  padding: 7px 14px;
+  border-radius: 20px;
+  font-family: var(--font-mono);
+  font-weight: 600;
+  font-size: 14px;
+}
+.urgency-badge.routine { background: var(--teal-tint); color: var(--teal); }
+.urgency-badge.elevated { background: var(--brass-tint); color: var(--brass); }
+.urgency-badge.urgent { background: var(--stamp-tint); color: var(--stamp); }
+.urgency-dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: currentColor;
+}
+
+.patient-pick {
+  cursor: pointer;
+  transition: border-color 0.12s, background 0.12s;
+}
+.patient-pick:hover { border-color: var(--teal); }
+.patient-pick.selected {
+  border-left-color: var(--teal);
+  background: var(--teal-tint);
+}
+
+.mode-toggle {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  background: none;
+  border: none;
+  color: var(--teal);
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+  padding: 6px 2px;
+}
+.mode-toggle svg { width: 15px; height: 15px; }
+
 .ledger-card {
   background: var(--paper-card);
   border: 1px solid var(--border);
