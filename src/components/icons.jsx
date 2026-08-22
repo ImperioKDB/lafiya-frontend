@@ -147,3 +147,30 @@ export function SearchIcon(props) {
     </svg>
   )
 }
+
+export function BankIcon(props) {
+  return (
+    <svg viewBox="0 0 24 24" {...base} {...props}>
+      <path d="M3 9.5 12 4l9 5.5" />
+      <path d="M4.5 9.5v9M9 9.5v9M15 9.5v9M19.5 9.5v9" />
+      <path d="M3 20.5h18" />
+    </svg>
+  )
+}
+
+export function PhoneIcon(props) {
+  return (
+    <svg viewBox="0 0 24 24" {...base} {...props}>
+      <path d="M6 3.5h3.2l1.3 4.2-2.1 1.7a11 11 0 0 0 5.2 5.2l1.7-2.1 4.2 1.3V17a2 2 0 0 1-2.2 2C10.9 18.5 5.5 13.1 4 6.7A2 2 0 0 1 6 3.5Z" />
+    </svg>
+  )
+}
+
+export function CheckIcon(props) {
+  return (
+    <svg viewBox="0 0 24 24" {...base} {...props}>
+      <circle cx="12" cy="12" r="9" />
+      <path d="m8.5 12.5 2.3 2.3L16 10" />
+    </svg>
+  )
+}
