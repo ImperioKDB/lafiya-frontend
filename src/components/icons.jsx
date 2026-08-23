@@ -174,3 +174,30 @@ export function CheckIcon(props) {
     </svg>
   )
 }
+
+export function ClipboardIcon(props) {
+  return (
+    <svg viewBox="0 0 24 24" {...base} {...props}>
+      <rect x="6" y="4.5" width="12" height="16" rx="2" />
+      <path d="M9 4.5V4a1.5 1.5 0 0 1 1.5-1.5h3A1.5 1.5 0 0 1 15 4v.5" />
+      <path d="M9 11h6M9 14.5h6M9 18h3.5" />
+    </svg>
+  )
+}
+
+export function UserIcon(props) {
+  return (
+    <svg viewBox="0 0 24 24" {...base} {...props}>
+      <circle cx="12" cy="8.2" r="3.4" />
+      <path d="M4.8 20c.8-4.3 3.4-6.5 7.2-6.5s6.4 2.2 7.2 6.5" />
+    </svg>
+  )
+}
+
+export function BackArrowIcon(props) {
+  return (
+    <svg viewBox="0 0 24 24" {...base} {...props}>
+      <path d="m11 5-6 7 6 7M5 12h14" />
+    </svg>
+  )
+}
