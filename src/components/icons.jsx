@@ -210,3 +210,21 @@ export function PillIcon(props) {
     </svg>
   )
 }
+
+export function StoreIcon(props) {
+  return (
+    <svg viewBox="0 0 24 24" {...base} {...props}>
+      <path d="M4 4h16l1.5 5.5a2.3 2.3 0 0 1-4.4 1.1A2.3 2.3 0 0 1 15 12a2.3 2.3 0 0 1-4-1.4A2.3 2.3 0 0 1 7 12a2.3 2.3 0 0 1-4.4-1.5L4 4Z" />
+      <path d="M5.5 11.5V20h13v-8.5" />
+      <path d="M9.5 20v-5h5v5" />
+    </svg>
+  )
+}
+
+export function XIcon(props) {
+  return (
+    <svg viewBox="0 0 24 24" {...base} {...props}>
+      <path d="M6 6l12 12M18 6 6 18" />
+    </svg>
+  )
+}
