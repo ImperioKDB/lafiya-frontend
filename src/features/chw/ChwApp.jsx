@@ -4,13 +4,12 @@ import Dashboard from './Dashboard.jsx'
 import RegisterPatientScreen from './RegisterPatientScreen.jsx'
 import TriageScreen from './TriageScreen.jsx'
 import LoansScreen from './LoansScreen.jsx'
-import ComingSoon from './ComingSoon.jsx'
-import { EarningsIcon } from '../../components/icons.jsx'
+import EarningsScreen from './EarningsScreen.jsx'
 
 // Phase 1 -> Phase 2 migration, screen by screen, per README.md's build
-// order. Dashboard is real; the rest keep the same visual system
-// (ledger card, stamp, section-label) so nothing feels like a dead end
-// while it's being wired.
+// order. All 5 CHW screens are now real components -- ComingSoon.jsx
+// stays in the repo (unused for now) since the same pattern applies
+// to Doctor/Pharmacy/Admin screens next.
 export default function ChwApp() {
   return (
     <Routes>
@@ -19,17 +18,7 @@ export default function ChwApp() {
         <Route path="register" element={<RegisterPatientScreen />} />
         <Route path="triage" element={<TriageScreen />} />
         <Route path="loans" element={<LoansScreen />} />
-        <Route
-          path="earnings"
-          element={
-            <ComingSoon
-              icon={EarningsIcon}
-              title="Earnings Ledger"
-              description="Registration fees and repayment commission, itemized by status."
-              endpoint="GET /api/chw/earnings"
-            />
-          }
-        />
+        <Route path="earnings" element={<EarningsScreen />} />
       </Route>
     </Routes>
   )
