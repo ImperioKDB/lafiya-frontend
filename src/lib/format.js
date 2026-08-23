@@ -26,3 +26,10 @@ export function displayNameFromEmail(email) {
   const local = email.split('@')[0]
   return local.charAt(0).toUpperCase() + local.slice(1)
 }
+
+export function formatDate(dateStr) {
+  if (!dateStr) return ''
+  const d = new Date(dateStr)
+  if (Number.isNaN(d.getTime())) return ''
+  return d.toLocaleDateString('en-NG', { day: 'numeric', month: 'short' })
+}
