@@ -42,6 +42,11 @@ export async function fetchChwDashboard(accessToken) {
   return { patients, earnings }
 }
 
+export async function fetchEarnings(accessToken) {
+  const { data, notBuilt } = await safeFetch(ENDPOINTS.earnings, accessToken)
+  return { earnings: Array.isArray(data) ? data : [], notBuilt }
+}
+
 // ASSUMPTION -- confirm against the live router. Body shape assumed
 // from patients' columns (blueprint SS11) minus server-set fields
 // (id, registered_by_chw_id, created_at). `nin` stays optional --
