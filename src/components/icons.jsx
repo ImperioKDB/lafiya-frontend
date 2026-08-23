@@ -201,3 +201,12 @@ export function BackArrowIcon(props) {
     </svg>
   )
 }
+
+export function PillIcon(props) {
+  return (
+    <svg viewBox="0 0 24 24" {...base} {...props}>
+      <rect x="3.5" y="9.5" width="17" height="7.5" rx="3.75" transform="rotate(-30 12 13.25)" />
+      <path d="m11 9 2.5 6.5" />
+    </svg>
+  )
+}
