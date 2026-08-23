@@ -58,7 +58,7 @@ a {
 }
 .stamp.pending { color: var(--brass); }
 .stamp.verified, .stamp.confirmed, .stamp.matched, .stamp.repaid, .stamp.cleared { color: var(--teal); }
-.stamp.flagged, .stamp.declined, .stamp.rejected, .stamp.defaulted, .stamp.confirmed_fraud { color: var(--stamp); }
+.stamp.flagged, .stamp.declined, .stamp.rejected, .stamp.defaulted, .stamp.confirmed_fraud, .stamp.variance_flagged { color: var(--stamp); }
 .stamp.completed, .stamp.reviewed, .stamp.disbursed { color: var(--indigo); }
 
 .btn {
