@@ -3,7 +3,7 @@ import { useNavigate } from 'react-router-dom'
 import { useAuth } from '../lib/AuthContext.jsx'
 
 export default function Login() {
-  const { signIn, session, profile, loading, error } = useAuth()
+  const { signIn, session, profile, loading, error, wakingUp } = useAuth()
   const navigate = useNavigate()
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
@@ -16,13 +16,11 @@ export default function Login() {
     navigate('/' + profile.role, { replace: true })
   }
 
-  // FIX: previously this state was silent -- sign-in itself can
-  // succeed while the follow-up GET /api/me call fails (backend not
-  // deployed yet, CORS mismatch, account has no chw/doctor/pharmacy
-  // row). That left the button doing nothing visible with no error
-  // shown, which is worse than a clear failure. Signed in + not
-  // loading + no profile + a real error means exactly that case.
-  const showProfileError = !loading && session && !profile && error
+  // Signed in + not loading + no profile + a real error means the
+  // profile fetch failed for a reason that ISN'T a cold start (already
+  // retried and given up, or a real 403/role problem) -- see
+  // AuthContext's loadProfile for the retry logic that runs before this.
+  const showProfileError = !loading && session && !profile && error && !wakingUp
 
   async function handleSubmit(e) {
     e.preventDefault()
@@ -45,6 +43,20 @@ export default function Login() {
       <p className="eyebrow">LAFIYA</p>
       <h1>Sign in</h1>
 
+      {wakingUp && (
+        <div className="ledger-card" style={{ textAlign: 'left', marginTop: 16, marginBottom: 16, borderLeftColor: 'var(--brass)' }}>
+          <div className="loader-row">
+            <span className="loader-stamp"><span /><span /><span /></span>
+            Waking up the server…
+          </div>
+          <p className="muted" style={{ marginTop: 8 }}>
+            Free hosting sleeps after ~15 minutes idle. First sign-in after
+            a break can take up to a minute -- no need to retry manually,
+            this will pick up automatically once it's awake.
+          </p>
+        </div>
+      )}
+
       {showProfileError && (
         <div
           className="ledger-card alert"
@@ -53,13 +65,14 @@ export default function Login() {
           <strong style={{ fontSize: 13 }}>Signed in, but couldn't load your account</strong>
           <p className="muted" style={{ marginTop: 6 }}>{error}</p>
           <p className="muted" style={{ marginTop: 6 }}>
-            This usually means the backend's /api/me endpoint isn't reachable yet
-            (not deployed, or a CORS mismatch) -- not a wrong password.
+            This usually means the account has no linked role, or the
+            backend rejected the request outright -- not a wrong password,
+            and not just a cold start (that's already been retried).
           </p>
         </div>
       )}
 
-      {session && loading && !profile && (
+      {session && loading && !profile && !wakingUp && (
         <p className="muted" style={{ marginTop: 16 }}>Checking your account…</p>
       )}
 
