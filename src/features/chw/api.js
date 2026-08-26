@@ -80,6 +80,16 @@ export async function registerPatient(payload, accessToken) {
 // with different content types so whichever shape is right, only one
 // function needs editing once you've checked the live router --
 // nothing in the component needs to change.
+//
+// CONFIRMED this pass: it's (b). The live backend only ever accepts a
+// JSON body (see app/models/consultation.py / app/api/consultations.py)
+// -- there is no audio/Whisper handling wired up yet. Posting the
+// multipart audio blob to this endpoint 500'd the backend outright (a
+// real crash, now fixed server-side) and now returns a clean 415
+// explaining voice isn't live yet. submitVoiceTriage is left in place
+// since the recording UI still works and the backend now fails it
+// honestly, but there is no working voice path end-to-end yet -- only
+// submitTextTriage actually succeeds.
 
 export async function fetchPatients(accessToken) {
   const { data, notBuilt } = await safeFetch(ENDPOINTS.patients, accessToken)
@@ -113,6 +123,10 @@ export async function submitVoiceTriage(patientId, audioBlob, accessToken) {
 // or denied, or the CHW simply prefers typing. Keeps the same urgency
 // scorer in play per the blueprint's "single source of truth" note --
 // the scorer just runs against typed text instead of a transcript.
+// symptom_category is intentionally omitted -- the backend now defaults
+// it to "other" when absent (see app/models/consultation.py), since
+// this screen has no category-picker UI. Flagged there as a decision,
+// not silently assumed; revisit if a real picker gets added here.
 export async function submitTextTriage(patientId, transcript, accessToken) {
   return apiFetch(ENDPOINTS.consultations, {
     method: 'POST',
@@ -149,11 +163,17 @@ export async function createLoan(patientId, tierAmount, accessToken) {
   })
 }
 
+// CONFIRMED against the live backend (app/models/loan.py
+// GuarantorAttach) -- the real request body is a flat array under
+// guarantor_phones, e.g. { guarantor_phones: ["...", "..."] }. This
+// previously sent a nested { guarantors: [{ guarantor_phone }] } shape
+// that was never right, which is exactly why every attempt to attach
+// guarantors 422'd.
 export async function attachGuarantors(loanId, phones, accessToken) {
   return apiFetch(`${LOAN_ENDPOINTS.loans}/${loanId}/guarantors`, {
     method: 'POST',
     accessToken,
-    body: { guarantors: phones.map((phone) => ({ guarantor_phone: phone })) },
+    body: { guarantor_phones: phones },
   })
 }
 
