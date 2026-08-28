@@ -12,7 +12,21 @@ import {
   PulseIcon,
 } from '../../components/icons.jsx'
 
-const STEP = { PICK: 'pick', CAPTURE: 'capture', SUBMITTING: 'submitting', SCORED: 'scored', ERROR: 'error' }
+const STEP = { PICK: 'pick', CATEGORY: 'category', CAPTURE: 'capture', SUBMITTING: 'submitting', SCORED: 'scored', ERROR: 'error' }
+
+// Exact same five categories, same order, as the USSD numeric menu
+// (Master Build Spec SS9 / app/api/ussd.py's SYMPTOM_MENU_ORDER) --
+// PRD SS6.7's "single source of truth" note applies to the category
+// list itself, not just the scorer behind it. Selecting one is now
+// required before recording or typing -- nothing on this screen falls
+// through to a bare "other" default anymore.
+const SYMPTOM_CATEGORIES = [
+  { value: 'fever_body_pain', label: 'Fever / Body pain' },
+  { value: 'stomach_digestive', label: 'Stomach / Digestive' },
+  { value: 'pregnancy_related', label: 'Pregnancy-related' },
+  { value: 'injury', label: 'Injury' },
+  { value: 'other', label: 'Other' },
+]
 
 export default function TriageScreen() {
   const { accessToken } = useAuth()
@@ -26,6 +40,7 @@ export default function TriageScreen() {
   const [search, setSearch] = useState('')
   const [selectedPatient, setSelectedPatient] = useState(null)
 
+  const [symptomCategory, setSymptomCategory] = useState(null)
   const [mode, setMode] = useState('voice') // voice | text
   const [transcriptDraft, setTranscriptDraft] = useState('')
   const [errorMessage, setErrorMessage] = useState(null)
@@ -44,18 +59,23 @@ export default function TriageScreen() {
 
   function pickPatient(patient) {
     setSelectedPatient(patient)
-    setStep(STEP.CAPTURE)
+    setStep(STEP.CATEGORY)
+  }
+
+  function pickManualPatient() {
+    if (!manualPatientId) return
+    setStep(STEP.CATEGORY)
   }
 
   async function handleSubmit({ audioBlob, transcript }) {
     const patientId = selectedPatient?.id || manualPatientId
-    if (!patientId) return
+    if (!patientId || !symptomCategory) return
     setStep(STEP.SUBMITTING)
     setErrorMessage(null)
     try {
       const consultation = audioBlob
-        ? await submitVoiceTriage(patientId, audioBlob, accessToken)
-        : await submitTextTriage(patientId, transcript, accessToken)
+        ? await submitVoiceTriage(patientId, symptomCategory, audioBlob, accessToken)
+        : await submitTextTriage(patientId, symptomCategory, transcript, accessToken)
       setResult(consultation)
       setStep(STEP.SCORED)
     } catch (err) {
@@ -67,6 +87,8 @@ export default function TriageScreen() {
   function reset() {
     setStep(STEP.PICK)
     setSelectedPatient(null)
+    setManualPatientId('')
+    setSymptomCategory(null)
     setTranscriptDraft('')
     setResult(null)
     setErrorMessage(null)
@@ -96,17 +118,29 @@ export default function TriageScreen() {
           onPick={pickPatient}
           manualPatientId={manualPatientId}
           onManualPatientId={setManualPatientId}
-          onManualContinue={() => manualPatientId && setStep(STEP.CAPTURE)}
+          onManualContinue={pickManualPatient}
+        />
+      )}
+
+      {step === STEP.CATEGORY && (
+        <CategoryStep
+          patient={selectedPatient}
+          selected={symptomCategory}
+          onSelect={setSymptomCategory}
+          onBack={() => setStep(STEP.PICK)}
+          onContinue={() => symptomCategory && setStep(STEP.CAPTURE)}
         />
       )}
 
       {step === STEP.CAPTURE && (
         <CaptureStep
           patient={selectedPatient}
+          symptomCategory={symptomCategory}
           mode={mode}
           onModeChange={setMode}
           transcriptDraft={transcriptDraft}
           onTranscriptDraft={setTranscriptDraft}
+          onBack={() => setStep(STEP.CATEGORY)}
           onSubmit={handleSubmit}
         />
       )}
@@ -225,7 +259,52 @@ function PickPatientStep({ loading, patients, gap, search, onSearch, onPick, man
   )
 }
 
-function CaptureStep({ patient, mode, onModeChange, transcriptDraft, onTranscriptDraft, onSubmit }) {
+// New step -- mirrors the USSD "Select symptom category" sub-menu
+// (Master Build Spec SS9) as a ledger-card radio group, same visual
+// pattern as LoansScreen's tier picker so the interaction feels
+// consistent across the CHW app rather than inventing a new control.
+function CategoryStep({ patient, selected, onSelect, onBack, onContinue }) {
+  return (
+    <div>
+      {patient && (
+        <div className="ledger-card" style={{ marginBottom: 18 }}>
+          <p className="ledger-number" style={{ margin: 0 }}>TRIAGE FOR</p>
+          <p style={{ margin: '3px 0 0', fontWeight: 600 }}>{patient.full_name}</p>
+        </div>
+      )}
+      <p className="section-label">Symptom category</p>
+      <p className="muted" style={{ marginBottom: 14 }}>
+        Same categories as the USSD line -- this feeds the same urgency scorer either way.
+      </p>
+
+      {SYMPTOM_CATEGORIES.map((cat) => (
+        <div
+          key={cat.value}
+          className={'ledger-card finance tier-card' + (selected === cat.value ? ' selected' : '')}
+          onClick={() => onSelect(cat.value)}
+          role="radio"
+          aria-checked={selected === cat.value}
+          tabIndex={0}
+          onKeyDown={(e) => (e.key === 'Enter' || e.key === ' ') && onSelect(cat.value)}
+        >
+          <div className="tier-amount" style={{ fontFamily: 'var(--font-sans)', fontSize: 15, fontWeight: 600 }}>
+            {cat.label}
+          </div>
+          <div className="tier-radio" />
+        </div>
+      ))}
+
+      <div style={{ display: 'flex', gap: 10, marginTop: 16 }}>
+        <button className="btn btn-outline" style={{ flex: 1 }} onClick={onBack}>Back</button>
+        <button className="btn btn-primary" style={{ flex: 1 }} disabled={!selected} onClick={onContinue}>
+          Continue
+        </button>
+      </div>
+    </div>
+  )
+}
+
+function CaptureStep({ patient, symptomCategory, mode, onModeChange, transcriptDraft, onTranscriptDraft, onBack, onSubmit }) {
   const [micState, setMicState] = useState('idle') // idle | recording | recorded | denied
   const [elapsed, setElapsed] = useState(0)
   const [audioBlob, setAudioBlob] = useState(null)
@@ -233,6 +312,8 @@ function CaptureStep({ patient, mode, onModeChange, transcriptDraft, onTranscrip
   const chunksRef = useRef([])
   const timerRef = useRef(null)
   const streamRef = useRef(null)
+
+  const categoryLabel = SYMPTOM_CATEGORIES.find((c) => c.value === symptomCategory)?.label
 
   useEffect(() => () => cleanupStream(), [])
 
@@ -278,13 +359,16 @@ function CaptureStep({ patient, mode, onModeChange, transcriptDraft, onTranscrip
   return (
     <div>
       {patient && (
-        <div className="ledger-card" style={{ marginBottom: 20 }}>
+        <div className="ledger-card" style={{ marginBottom: 12 }}>
           <p className="ledger-number" style={{ margin: 0 }}>TRIAGE FOR</p>
           <p style={{ margin: '3px 0 0', fontWeight: 600 }}>{patient.full_name}</p>
         </div>
       )}
 
-      <div style={{ display: 'flex', justifyContent: 'flex-end', marginBottom: 10 }}>
+      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 10 }}>
+        <button type="button" className="mode-toggle" onClick={onBack}>
+          {categoryLabel ? `Category: ${categoryLabel}` : 'Change category'}
+        </button>
         <button
           type="button"
           className="mode-toggle"
