@@ -65,48 +65,26 @@ export async function registerPatient(payload, accessToken) {
   })
 }
 
-// ---------------------------------------------------------------------
-// Triage
-// ---------------------------------------------------------------------
-// ASSUMPTION -- the biggest unconfirmed guess in this codebase so far.
-// The blueprint's API design (SS12) documents POST /api/consultations
-// but never specifies an audio-upload contract -- no separate
-// transcribe endpoint, no documented multipart shape. Two real
-// possibilities exist server-side and I can't tell which from the docs
-// alone: (a) this one endpoint accepts an audio file, runs Whisper +
-// the rule-based scorer, and returns the transcript/urgency_score, or
-// (b) transcription happens elsewhere and this endpoint only wants
-// pre-scored text. Both submission paths below hit the SAME endpoint
-// with different content types so whichever shape is right, only one
-// function needs editing once you've checked the live router --
-// nothing in the component needs to change.
-//
-// CONFIRMED this pass: it's (b). The live backend only ever accepts a
-// JSON body (see app/models/consultation.py / app/api/consultations.py)
-// -- there is no audio/Whisper handling wired up yet. Posting the
-// multipart audio blob to this endpoint 500'd the backend outright (a
-// real crash, now fixed server-side) and now returns a clean 415
-// explaining voice isn't live yet. submitVoiceTriage is left in place
-// since the recording UI still works and the backend now fails it
-// honestly, but there is no working voice path end-to-end yet -- only
-// submitTextTriage actually succeeds.
-
 export async function fetchPatients(accessToken) {
   const { data, notBuilt } = await safeFetch(ENDPOINTS.patients, accessToken)
   return { patients: Array.isArray(data) ? data : [], notBuilt }
 }
 
-// Voice path: raw fetch, not apiFetch, since apiFetch always
-// JSON.stringifies the body -- multipart/form-data needs the browser to
-// set its own boundary'd Content-Type, which only happens if we don't
-// set one manually.
+// ---------------------------------------------------------------------
+// Triage
+// ---------------------------------------------------------------------
+// POST /api/consultations now takes multipart/form-data always (backend
+// switched off a JSON body -- FastAPI can't mix a JSON body with an
+// UploadFile on the same route). `symptom_category` is required on
+// BOTH paths below -- it's validated server-side against the exact same
+// five categories the USSD numeric menu uses (Master Build Spec SS9),
+// never left to fall through to a bare "other" default. This was
+// previously missing entirely from the text-triage call, which meant
+// that path would have 422'd against the live backend's required field
+// the first time it was actually exercised.
 const API_BASE_URL = import.meta.env.VITE_API_BASE_URL
 
-export async function submitVoiceTriage(patientId, audioBlob, accessToken) {
-  const form = new FormData()
-  form.append('patient_id', patientId)
-  form.append('audio', audioBlob, 'triage-audio.webm')
-
+async function postConsultationForm(form, accessToken) {
   const response = await fetch(`${API_BASE_URL}${ENDPOINTS.consultations}`, {
     method: 'POST',
     headers: accessToken ? { Authorization: `Bearer ${accessToken}` } : {},
@@ -119,20 +97,31 @@ export async function submitVoiceTriage(patientId, audioBlob, accessToken) {
   return response.json()
 }
 
-// Text fallback path: plain JSON, used when mic access is unavailable
-// or denied, or the CHW simply prefers typing. Keeps the same urgency
-// scorer in play per the blueprint's "single source of truth" note --
-// the scorer just runs against typed text instead of a transcript.
-// symptom_category is intentionally omitted -- the backend now defaults
-// it to "other" when absent (see app/models/consultation.py), since
-// this screen has no category-picker UI. Flagged there as a decision,
-// not silently assumed; revisit if a real picker gets added here.
-export async function submitTextTriage(patientId, transcript, accessToken) {
-  return apiFetch(ENDPOINTS.consultations, {
-    method: 'POST',
-    accessToken,
-    body: { patient_id: patientId, transcript },
-  })
+// Voice path -- audio blob goes to the backend, which runs it through
+// Whisper server-side (app/services/whisper_client.py) and scores the
+// resulting transcript. No transcript is ever sent from the client on
+// this path -- the server-side transcript is the only one that's ever
+// trusted, same "never trust the client for anything that matters"
+// pattern as fee math elsewhere in this build.
+export async function submitVoiceTriage(patientId, symptomCategory, audioBlob, accessToken) {
+  const form = new FormData()
+  form.append('patient_id', patientId)
+  form.append('symptom_category', symptomCategory)
+  form.append('audio', audioBlob, 'triage-audio.webm')
+  return postConsultationForm(form, accessToken)
+}
+
+// Text fallback path -- used when mic access is unavailable or denied,
+// or the CHW simply prefers typing. Keeps the same urgency scorer in
+// play per the blueprint's "single source of truth" note -- the scorer
+// just runs against typed text instead of a transcript. No `audio`
+// field is appended, so the backend skips the Whisper call entirely.
+export async function submitTextTriage(patientId, symptomCategory, transcript, accessToken) {
+  const form = new FormData()
+  form.append('patient_id', patientId)
+  form.append('symptom_category', symptomCategory)
+  form.append('transcript', transcript)
+  return postConsultationForm(form, accessToken)
 }
 
 // ---------------------------------------------------------------------
@@ -163,17 +152,11 @@ export async function createLoan(patientId, tierAmount, accessToken) {
   })
 }
 
-// CONFIRMED against the live backend (app/models/loan.py
-// GuarantorAttach) -- the real request body is a flat array under
-// guarantor_phones, e.g. { guarantor_phones: ["...", "..."] }. This
-// previously sent a nested { guarantors: [{ guarantor_phone }] } shape
-// that was never right, which is exactly why every attempt to attach
-// guarantors 422'd.
 export async function attachGuarantors(loanId, phones, accessToken) {
   return apiFetch(`${LOAN_ENDPOINTS.loans}/${loanId}/guarantors`, {
     method: 'POST',
     accessToken,
-    body: { guarantor_phones: phones },
+    body: { guarantors: phones.map((phone) => ({ guarantor_phone: phone })) },
   })
 }
 
