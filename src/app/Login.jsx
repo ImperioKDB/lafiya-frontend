@@ -1,5 +1,5 @@
 import { useState } from 'react'
-import { useNavigate } from 'react-router-dom'
+import { Link, useNavigate } from 'react-router-dom'
 import { useAuth } from '../lib/AuthContext.jsx'
 import { PulseIcon } from '../components/icons.jsx'
 
@@ -41,8 +41,15 @@ export default function Login() {
 
   return (
     <div className="scaffold-screen">
+      <Link to="/" className="mode-toggle" style={{ marginBottom: 18, display: 'inline-flex' }}>
+        Back to LAFIYA
+      </Link>
       <p className="eyebrow">LAFIYA</p>
       <h1>Sign in</h1>
+      <p className="muted" style={{ marginTop: 6 }}>
+        No self-serve signup -- accounts are set up by your CHW post,
+        hospital, pharmacy, or a LAFIYA admin.
+      </p>
 
       {wakingUp && (
         <div className="ledger-card" style={{ textAlign: 'left', marginTop: 16, marginBottom: 16, borderLeftColor: 'var(--brass)' }}>
