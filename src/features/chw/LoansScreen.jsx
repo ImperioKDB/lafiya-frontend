@@ -11,6 +11,7 @@ import {
   PhoneIcon,
   BankIcon,
   CheckIcon,
+  LoansIcon,
 } from '../../components/icons.jsx'
 
 const STEP = {
@@ -166,7 +167,13 @@ export default function LoansScreen() {
         />
       )}
 
-      {step === STEP.CREATING && <InlineLoader label="Creating loan…" />}
+      {step === STEP.CREATING && (
+        <ActionLoader
+          icon={LoansIcon}
+          label="Creating loan…"
+          sub="Computing fee and repayment terms server-side"
+        />
+      )}
 
       {step === STEP.GUARANTORS && (
         <GuarantorsStep
@@ -197,7 +204,13 @@ export default function LoansScreen() {
         />
       )}
 
-      {step === STEP.DISBURSING && <InlineLoader label="Checking Wema/ALAT and disbursing…" />}
+      {step === STEP.DISBURSING && (
+        <ActionLoader
+          icon={BankIcon}
+          label="Checking Wema/ALAT and disbursing…"
+          sub="Live sandbox account lookup in progress"
+        />
+      )}
 
       {step === STEP.DONE && disbursement && (
         <DisburseResult disbursement={disbursement} loan={loan} onDone={() => navigate('/chw')} onAnother={resetAll} />
@@ -217,11 +230,18 @@ export default function LoansScreen() {
   )
 }
 
-function InlineLoader({ label }) {
+// Bigger, tactile stamp-press mark for a single transient operation
+// (creating a loan, hitting the Wema sandbox) -- replaces the old
+// plain text-plus-dots InlineLoader, which read as an apology rather
+// than a real moment in the flow.
+function ActionLoader({ icon: Icon, label, sub }) {
   return (
-    <div className="loader-row" style={{ justifyContent: 'center', padding: '40px 0' }}>
-      <span className="loader-stamp"><span /><span /><span /></span>
-      {label}
+    <div className="action-loader" role="status" aria-live="polite">
+      <div className="action-loader-mark"><Icon /></div>
+      <div>
+        <p className="action-loader-label">{label}</p>
+        {sub && <p className="action-loader-sub">{sub}</p>}
+      </div>
     </div>
   )
 }
@@ -229,7 +249,7 @@ function InlineLoader({ label }) {
 function PickPatientStep({ loading, patients, gap, search, onSearch, onPick }) {
   if (loading) {
     return (
-      <div>
+      <div aria-busy="true" aria-label="Loading patients">
         <div className="skeleton skeleton-line" style={{ width: '60%' }} />
         <div className="skeleton skeleton-card" />
         <div className="skeleton skeleton-card" />
@@ -378,7 +398,7 @@ function AwaitingStep({ guarantors, bothConfirmed, anyDeclined, onRefresh, onRet
             <div style={{ fontWeight: 600, fontSize: 14 }}>{g.guarantor_phone}</div>
             <div className="entry-meta">50% liability</div>
           </div>
-          <span className={`stamp ${g.status}`}>
+          <span key={g.status} className={`stamp ${g.status}`}>
             {g.status === 'confirmed' && <CheckIcon style={{ width: 12, height: 12 }} />}
             {g.status}
           </span>
