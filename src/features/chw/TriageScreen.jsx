@@ -146,9 +146,14 @@ export default function TriageScreen() {
       )}
 
       {step === STEP.SUBMITTING && (
-        <div className="loader-row" style={{ justifyContent: 'center', padding: '40px 0' }}>
-          <span className="loader-stamp"><span /><span /><span /></span>
-          {mode === 'voice' ? 'Transcribing and scoring…' : 'Scoring…'}
+        <div className="action-loader" role="status" aria-live="polite">
+          <div className="action-loader-mark"><PulseIcon /></div>
+          <div>
+            <p className="action-loader-label">
+              {mode === 'voice' ? 'Transcribing and scoring…' : 'Scoring…'}
+            </p>
+            <p className="action-loader-sub">Same urgency scorer as the USSD path</p>
+          </div>
         </div>
       )}
 
@@ -180,7 +185,7 @@ export default function TriageScreen() {
 function PickPatientStep({ loading, patients, gap, search, onSearch, onPick, manualPatientId, onManualPatientId, onManualContinue }) {
   if (loading) {
     return (
-      <div>
+      <div aria-busy="true" aria-label="Loading patients">
         <div className="skeleton skeleton-line" style={{ width: '60%' }} />
         <div className="skeleton skeleton-card" />
         <div className="skeleton skeleton-card" />
@@ -259,10 +264,10 @@ function PickPatientStep({ loading, patients, gap, search, onSearch, onPick, man
   )
 }
 
-// New step -- mirrors the USSD "Select symptom category" sub-menu
-// (Master Build Spec SS9) as a ledger-card radio group, same visual
-// pattern as LoansScreen's tier picker so the interaction feels
-// consistent across the CHW app rather than inventing a new control.
+// Mirrors the USSD "Select symptom category" sub-menu (Master Build
+// Spec SS9) as a ledger-card radio group, same visual pattern as
+// LoansScreen's tier picker so the interaction feels consistent
+// across the CHW app rather than inventing a new control.
 function CategoryStep({ patient, selected, onSelect, onBack, onContinue }) {
   return (
     <div>
