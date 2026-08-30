@@ -1,6 +1,7 @@
 import { useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { useAuth } from '../lib/AuthContext.jsx'
+import { PulseIcon } from '../components/icons.jsx'
 
 export default function Login() {
   const { signIn, session, profile, loading, error, wakingUp } = useAuth()
@@ -45,14 +46,18 @@ export default function Login() {
 
       {wakingUp && (
         <div className="ledger-card" style={{ textAlign: 'left', marginTop: 16, marginBottom: 16, borderLeftColor: 'var(--brass)' }}>
-          <div className="loader-row">
-            <span className="loader-stamp"><span /><span /><span /></span>
-            Waking up the server…
+          <div className="action-loader" style={{ padding: '16px 4px' }} role="status" aria-live="polite">
+            <div className="action-loader-mark" style={{ borderColor: 'var(--brass)', color: 'var(--brass)' }}>
+              <PulseIcon />
+            </div>
+            <div>
+              <p className="action-loader-label">Waking up the server…</p>
+              <p className="action-loader-sub">First sign-in after idle can take up to a minute</p>
+            </div>
           </div>
-          <p className="muted" style={{ marginTop: 8 }}>
-            Free hosting sleeps after ~15 minutes idle. First sign-in after
-            a break can take up to a minute -- no need to retry manually,
-            this will pick up automatically once it's awake.
+          <p className="muted" style={{ marginTop: 4 }}>
+            Free hosting sleeps after ~15 minutes idle -- no need to retry
+            manually, this will pick up automatically once it's awake.
           </p>
         </div>
       )}
@@ -73,7 +78,13 @@ export default function Login() {
       )}
 
       {session && loading && !profile && !wakingUp && (
-        <p className="muted" style={{ marginTop: 16 }}>Checking your account…</p>
+        <div style={{ marginTop: 16 }} aria-busy="true" aria-label="Checking your account">
+          <div className="loader-row" style={{ marginBottom: 10 }}>
+            <span className="loader-stamp"><span /><span /><span /></span>
+            Checking your account…
+          </div>
+          <div className="skeleton skeleton-line" style={{ width: '70%' }} />
+        </div>
       )}
 
       <form onSubmit={handleSubmit} style={{ textAlign: 'left', marginTop: 24 }}>
