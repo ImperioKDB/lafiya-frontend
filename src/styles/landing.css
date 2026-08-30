@@ -1,0 +1,184 @@
+.landing {
+  min-height: 100vh;
+  background: var(--paper);
+}
+
+.landing-nav {
+  max-width: 1080px;
+  margin: 0 auto;
+  padding: 22px 24px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+.landing-wordmark {
+  font-family: var(--font-sans);
+  font-weight: 700;
+  font-size: 18px;
+  letter-spacing: -0.01em;
+  color: var(--ink);
+}
+
+/* ---- Hero: asymmetric split, ledger spread on the right ----------- */
+.landing-hero {
+  max-width: 1080px;
+  margin: 0 auto;
+  padding: 36px 24px 64px;
+  display: grid;
+  grid-template-columns: 1.1fr 0.9fr;
+  gap: 48px;
+  align-items: center;
+}
+.landing-hero-text h1 {
+  font-family: var(--font-sans);
+  font-weight: 700;
+  font-size: 40px;
+  line-height: 1.12;
+  letter-spacing: -0.01em;
+  margin: 0 0 16px;
+  max-width: 15ch;
+}
+.landing-hero-sub {
+  font-size: 16px;
+  line-height: 1.55;
+  color: var(--ink-soft);
+  max-width: 46ch;
+  margin: 0 0 26px;
+}
+.landing-hero-cta {
+  display: flex;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+
+.landing-ledger {
+  background: var(--paper-card);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 20px;
+  box-shadow: var(--shadow);
+}
+.landing-ledger-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 12px 0;
+  border-top: 1px solid var(--border);
+}
+.landing-ledger-row:first-of-type { border-top: none; }
+.landing-ledger-label {
+  font-size: 13.5px;
+  font-weight: 600;
+  margin: 0;
+}
+
+/* ---- Shared section rhythm ----------------------------------------- */
+.landing-section {
+  max-width: 1080px;
+  margin: 0 auto;
+  padding: 48px 24px;
+  border-top: 1px solid var(--border);
+}
+.landing-section h2 {
+  font-family: var(--font-sans);
+  font-weight: 700;
+  font-size: 26px;
+  letter-spacing: -0.01em;
+  margin: 0 0 8px;
+  max-width: 22ch;
+}
+.landing-section-sub {
+  color: var(--ink-soft);
+  font-size: 14.5px;
+  max-width: 56ch;
+  margin: 0 0 28px;
+  line-height: 1.5;
+}
+
+/* ---- Loop: literal ledger rows, numbering earned by being a real
+   sequence -------------------------------------------------------- */
+.landing-loop {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+.landing-loop-row {
+  display: flex;
+  align-items: flex-start;
+  gap: 16px;
+  border-left-color: var(--indigo);
+}
+.landing-loop-n {
+  flex-shrink: 0;
+  padding-top: 3px;
+  width: 44px;
+}
+.landing-loop-icon {
+  width: 34px;
+  height: 34px;
+  border-radius: 9px;
+  background: var(--indigo-tint);
+  color: var(--indigo);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+.landing-loop-icon svg { width: 17px; height: 17px; }
+.landing-loop-body { flex: 1; }
+.landing-loop-title {
+  font-weight: 600;
+  font-size: 15px;
+  margin: 0;
+}
+
+/* ---- Roles: 2x2 grid, not the generic 3-equal-card row ------------- */
+.landing-roles {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px;
+}
+.landing-role-card { margin-bottom: 0; }
+.landing-role-teal { border-left-color: var(--teal); }
+.landing-role-indigo { border-left-color: var(--indigo); }
+.landing-role-brass { border-left-color: var(--brass); }
+.landing-role-neutral { border-left-color: var(--border); }
+
+.landing-role-icon {
+  width: 36px;
+  height: 36px;
+  border-radius: 9px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-bottom: 12px;
+}
+.landing-role-icon svg { width: 18px; height: 18px; }
+.landing-role-icon-teal { background: var(--teal-tint); color: var(--teal); }
+.landing-role-icon-indigo { background: var(--indigo-tint); color: var(--indigo); }
+.landing-role-icon-brass { background: var(--brass-tint); color: var(--brass); }
+.landing-role-icon-neutral { background: var(--paper-dim); color: var(--ink-soft); }
+
+/* ---- Footer ---------------------------------------------------------- */
+.landing-footer {
+  max-width: 1080px;
+  margin: 0 auto;
+  padding: 32px 24px 48px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+/* ---- Mobile collapse: every multi-column block here folds to one
+   column under 768px, explicit per section rather than assumed ------ */
+@media (max-width: 768px) {
+  .landing-hero {
+    grid-template-columns: 1fr;
+    padding-top: 24px;
+    padding-bottom: 40px;
+    gap: 32px;
+  }
+  .landing-hero-text h1 { font-size: 30px; max-width: none; }
+  .landing-roles { grid-template-columns: 1fr; }
+}
