@@ -38,10 +38,13 @@ a {
   font-family: var(--font-mono);
 }
 
-/* Signature element -- see lafiya-mockup.html for the full state set
-   and the "thunk" entrance animation. Ported here without the
-   animation yet; that arrives with the first screen that actually
-   flips a stamp on a real state change. */
+/* Signature element -- the stamp presses down onto the ledger on
+   mount (blueprint SS8). Plays automatically whenever the element is
+   inserted into the DOM. Where the SAME element persists but its
+   status changes in place (a polled guarantor confirming, an
+   earnings row refetching with a new status), pair the element with
+   a `key` prop keyed to the status value so React remounts it and
+   the press replays -- see LoansScreen.jsx / EarningsScreen.jsx. */
 .stamp {
   display: inline-flex;
   align-items: center;
@@ -53,8 +56,17 @@ a {
   padding: 4px 11px;
   border: 2px solid currentColor;
   border-radius: 4px;
-  transform: rotate(-3deg);
   background: rgba(0, 0, 0, 0.02);
+  animation: stampThunk 0.38s cubic-bezier(0.34, 1.56, 0.64, 1) both;
+}
+@keyframes stampThunk {
+  0% { transform: rotate(-3deg) scale(1.9); opacity: 0; }
+  55% { transform: rotate(-3deg) scale(0.92); opacity: 1; }
+  78% { transform: rotate(-3deg) scale(1.04); }
+  100% { transform: rotate(-3deg) scale(1); }
+}
+@media (prefers-reduced-motion: reduce) {
+  .stamp { animation: none; transform: rotate(-3deg); }
 }
 .stamp.pending { color: var(--brass); }
 .stamp.verified, .stamp.confirmed, .stamp.matched, .stamp.repaid, .stamp.cleared { color: var(--teal); }
@@ -179,9 +191,18 @@ a {
 
 .patient-pick {
   cursor: pointer;
-  transition: border-color 0.12s, background 0.12s;
+  transition: border-color 0.12s, background 0.12s,
+    transform 0.15s cubic-bezier(0.2, 0.7, 0.3, 1), box-shadow 0.15s ease;
 }
-.patient-pick:hover { border-color: var(--teal); }
+.patient-pick:hover {
+  border-color: var(--teal);
+  transform: translateY(-2px);
+  box-shadow: 0 6px 16px rgba(27, 36, 48, 0.08);
+}
+.patient-pick:active {
+  transform: translateY(0) scale(0.98);
+  box-shadow: var(--shadow);
+}
 .patient-pick.selected {
   border-left-color: var(--teal);
   background: var(--teal-tint);
@@ -207,6 +228,15 @@ a {
   align-items: center;
   justify-content: space-between;
   cursor: pointer;
+  transition: border-color 0.12s, background 0.12s,
+    transform 0.15s cubic-bezier(0.2, 0.7, 0.3, 1), box-shadow 0.15s ease;
+}
+.tier-card:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 16px rgba(27, 36, 48, 0.08);
+}
+.tier-card:active {
+  transform: translateY(0) scale(0.98);
 }
 .tier-card.selected {
   border-left-color: var(--teal);
@@ -336,15 +366,21 @@ a {
   padding: 12px 14px;
   margin-bottom: 8px;
   cursor: pointer;
-  transition: border-color 0.12s, background 0.12s;
+  transition: border-color 0.12s, background 0.12s,
+    transform 0.15s cubic-bezier(0.2, 0.7, 0.3, 1), box-shadow 0.15s ease;
 }
-.queue-item:hover { border-color: var(--indigo); }
+.queue-item:hover {
+  border-color: var(--indigo);
+  transform: translateY(-2px);
+  box-shadow: 0 6px 16px rgba(27, 36, 48, 0.08);
+}
 .queue-item.urgent { border-left-color: var(--stamp); }
 .queue-item.elevated { border-left-color: var(--brass); }
 .queue-item.routine { border-left-color: var(--teal); }
 .queue-item.selected {
   background: var(--indigo-tint);
   border-color: var(--indigo);
+  transform: none;
 }
 .queue-item-top {
   display: flex;
@@ -525,9 +561,7 @@ a {
   color: var(--ink-soft);
 }
 
-/* ---- Signature loader --------------------------------------------- */
-/* Three ledger marks pressing down in sequence -- an ink-stamp rhythm
-   instead of a generic spinner. */
+/* ---- Signature inline loader (small, for buttons and quick waits) -- */
 .loader-row {
   display: flex;
   align-items: center;
@@ -556,6 +590,51 @@ a {
 }
 @media (prefers-reduced-motion: reduce) {
   .loader-stamp span { animation: none; opacity: 0.75; }
+}
+
+/* ---- Action loader -- for a single transient operation (creating a
+   loan, checking the Wema sandbox, transcribing, waking a cold
+   backend) rather than a list fetch. A bigger, more tactile stamp-
+   press mark filling the wait, not a lone line of text apologising
+   for it. ------------------------------------------------------------ */
+.action-loader {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 16px;
+  padding: 48px 20px;
+  text-align: center;
+}
+.action-loader-mark {
+  width: 56px;
+  height: 56px;
+  border-radius: 10px;
+  border: 2.5px solid var(--teal);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--teal);
+  animation: actionMarkPress 1.3s cubic-bezier(0.45, 0, 0.55, 1) infinite;
+}
+.action-loader-mark svg { width: 26px; height: 26px; }
+@keyframes actionMarkPress {
+  0%, 100% { transform: rotate(-4deg) scale(1); box-shadow: 0 4px 10px rgba(31, 111, 92, 0.18); }
+  45% { transform: rotate(-4deg) scale(0.88); box-shadow: 0 1px 4px rgba(31, 111, 92, 0.1); }
+  60% { transform: rotate(-4deg) scale(1.03); }
+}
+.action-loader-label {
+  font-size: 13.5px;
+  font-weight: 600;
+  color: var(--ink);
+  margin: 0;
+}
+.action-loader-sub {
+  font-size: 12px;
+  color: var(--ink-soft);
+  margin: 3px 0 0;
+}
+@media (prefers-reduced-motion: reduce) {
+  .action-loader-mark { animation: none; }
 }
 
 /* ---- Skeletons ------------------------------------------------------- */
@@ -634,4 +713,11 @@ a {
 }
 @media (prefers-reduced-motion: reduce) {
   .stagger-in { animation: none; }
+}
+
+/* ---- Reduced-motion catch-all for the new hover/press feedback ------- */
+@media (prefers-reduced-motion: reduce) {
+  .patient-pick, .tier-card, .queue-item { transition: none; }
+  .patient-pick:hover, .tier-card:hover, .queue-item:hover { transform: none; box-shadow: var(--shadow); }
+  .patient-pick:active, .tier-card:active { transform: none; }
 }
