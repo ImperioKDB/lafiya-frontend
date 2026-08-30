@@ -18,7 +18,7 @@ export default function RequireRole({ role, children }) {
   }
 
   if (!session) {
-    return <Navigate to="/" replace />
+    return <Navigate to="/login" replace />
   }
 
   if (error || !profile) {
