@@ -169,6 +169,12 @@ a {
   margin-top: 8px;
 }
 
+/* Same stamp-press family of motion as .stamp, scaled for a pill
+   badge rather than a rectangular mark -- settles in with a slight
+   overshoot instead of a full rotate-and-press, since this reads
+   as a live score, not an ink stamp. Plays on mount: fresh for the
+   Triage result screen (whole branch mounts fresh per submission),
+   and once per row as the Doctor queue populates. */
 .urgency-badge {
   display: inline-flex;
   align-items: center;
@@ -178,6 +184,15 @@ a {
   font-family: var(--font-mono);
   font-weight: 600;
   font-size: 14px;
+  animation: badgeSettle 0.34s cubic-bezier(0.34, 1.56, 0.64, 1) both;
+}
+@keyframes badgeSettle {
+  0% { transform: scale(0.6); opacity: 0; }
+  60% { transform: scale(1.08); opacity: 1; }
+  100% { transform: scale(1); }
+}
+@media (prefers-reduced-motion: reduce) {
+  .urgency-badge { animation: none; }
 }
 .urgency-badge.routine { background: var(--teal-tint); color: var(--teal); }
 .urgency-badge.elevated { background: var(--brass-tint); color: var(--brass); }
