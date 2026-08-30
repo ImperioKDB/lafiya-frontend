@@ -36,6 +36,7 @@
   display: flex;
   align-items: center;
   gap: 7px;
+  transition: color 0.12s, border-color 0.12s;
 }
 .admin-tab svg { width: 16px; height: 16px; }
 .admin-tab.active { color: var(--indigo); border-bottom-color: var(--indigo); }
@@ -81,10 +82,29 @@
   flex-shrink: 0;
 }
 
+/* Verify/Reject, Reviewed/Clear/Confirm fraud -- these carry real
+   consequence (a pharmacy gets listed, a fraud flag gets resolved),
+   so they get the same lift-on-hover, press-on-click feedback as the
+   ledger-card family instead of relying on the base .btn's plain
+   filter/scale alone. transform/opacity only, per the browser-aware
+   motion guidance -- no layout properties in the transition. */
 .btn-sm {
   min-height: 34px;
   padding: 0 12px;
   font-size: 12.5px;
+  transition: transform 0.12s cubic-bezier(0.2, 0.7, 0.3, 1), filter 0.12s, box-shadow 0.12s;
+}
+.btn-sm:hover:not(:disabled) {
+  transform: translateY(-1px);
+  box-shadow: 0 4px 10px rgba(27, 36, 48, 0.12);
+}
+.btn-sm:active:not(:disabled) {
+  transform: translateY(0) scale(0.96);
+  box-shadow: none;
+}
+@media (prefers-reduced-motion: reduce) {
+  .btn-sm { transition: filter 0.12s; }
+  .btn-sm:hover:not(:disabled), .btn-sm:active:not(:disabled) { transform: none; box-shadow: none; }
 }
 .btn-danger { background: var(--stamp); color: #fff; }
 .btn-danger:hover { filter: brightness(1.08); }
