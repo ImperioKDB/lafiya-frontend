@@ -56,7 +56,7 @@ export default function EarningsScreen() {
             <div className="ledger-card" style={{ borderLeftColor: 'var(--brass)', marginBottom: 16 }}>
               <p className="muted" style={{ margin: 0 }}>
                 The earnings endpoint isn't wired on the backend yet in
-                this environment — figures below will populate once it's live.
+                this environment -- figures below will populate once it's live.
               </p>
             </div>
           )}
@@ -106,7 +106,7 @@ export default function EarningsScreen() {
                     <div className="tabular" style={{ fontWeight: 700, fontSize: 14.5 }}>
                       {formatNaira(entry.amount)}
                     </div>
-                    <span className={`stamp ${entry.status}`} style={{ marginTop: 4 }}>
+                    <span key={entry.status} className={`stamp ${entry.status}`} style={{ marginTop: 4 }}>
                       {entry.status}
                     </span>
                   </div>
